@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"go.uber.org/zap"
 
+	"StakeBackendGoTest/api"
 	cfg "StakeBackendGoTest/configs"
 	"StakeBackendGoTest/controller"
 	def "StakeBackendGoTest/pkg/const"
@@ -39,14 +41,29 @@ func main() {
 	}
 
 	e := controller.NewEngine(cfg)
-	if err := e.Run(); err != nil {
+	api.AddRouters(e.Engine, e.DataManager)
+
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
+
+	done, err := e.Run(ctx)
+	if err != nil {
 		log.Logger.Panic("failed to start the server", zap.Error(err))
 	}
 
-	// install signal processor
+	// install signal handler
 	exit := make(chan os.Signal, 1)
 	signal.Notify(exit, syscall.SIGINT, syscall.SIGTERM)
-	<-exit
+
+	select {
+	case <-exit:
+		log.Logger.Info("closed manually. shutting down")
+		cancel()
+		break
+	case <-done:
+		log.Logger.Info("adaptor(s) were closed")
+		break
+	}
 
 	if err := e.Stop(); err != nil {
 		log.Logger.Panic("failed to stop the server", zap.Error(err))

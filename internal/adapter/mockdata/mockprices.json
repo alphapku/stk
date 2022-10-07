@@ -1,0 +1,20 @@
+{
+  "priceData": [
+    {
+      "marketStatus": "ACTIVE",
+      "symbol": "APT.ASX",
+      "lastTrade": 114.9800,
+      "bid": 114.98,
+      "ask": 114.99,
+      "priorClose": 119.8700
+    },
+    {
+      "marketStatus": "ACTIVE",
+      "symbol": "CBA.ASX",
+      "lastTrade": 104.6300,
+      "bid": 104.62,
+      "ask": 104.640,
+      "priorClose": 100.7700
+    }
+  ]
+}

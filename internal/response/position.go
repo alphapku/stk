@@ -1,7 +1,7 @@
 package response
 
 type StakePositions struct {
-	StakePositions []*StakePosition
+	StakePositions []StakePosition
 }
 
 type StakePosition struct {

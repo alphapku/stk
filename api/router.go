@@ -4,12 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 
 	mdw "StakeBackendGoTest/api/middleware"
-	cfg "StakeBackendGoTest/configs"
-	itnl "StakeBackendGoTest/internal"
+	// cfg "StakeBackendGoTest/configs"
+	ctrl "StakeBackendGoTest/controller"
+	// itnl "StakeBackendGoTest/internal"
 )
 
-func AddRouters(cfg *cfg.Config, e *gin.Engine) {
-	e.Use(mdw.Trace)
+func AddRouters(e *gin.Engine, d *ctrl.DataManager) {
+	e.Use(mdw.Auth, mdw.Trace)
 
-	e.GET("/api/equityPositions", itnl.NewAdapter(cfg.Adapter))
+	e.GET("/api/equityPositions", d.DoEquityPositions)
 }

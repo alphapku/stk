@@ -21,13 +21,6 @@ import (
 // 	return nil
 // }
 
-func NewAdapter(cfg *cfg.Adapter) gin.HandlerFunc {
-	switch cfg.AdapterType {
-	case def.MockAdapter:
-		mock := &adt.MockAdapter{}
-		return mock.Do
-	default:
-		mock := &adt.MockAdapter{}
-		return mock.Do
-	}
-}
+// func NewAdapter(cfg *cfg.Adapter) gin.HandlerFunc {
+
+// }
