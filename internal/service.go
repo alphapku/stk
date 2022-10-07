@@ -1,14 +1,33 @@
 package internal
 
-func GetUserEquityPositions(_ string) []StakePosition {
-	_ = ReadMockPositionData() // mockPositions
-	_ = ReadMockPriceData()    // mockPrices
+import (
+	cfg "StakeBackendGoTest/configs"
+	adt "StakeBackendGoTest/internal/adapter"
+	def "StakeBackendGoTest/pkg/const"
 
-	/* TODO: Transforms, conversions and calculations
-	 *  - transform mockdata/mockpositions to mockdata/mockprices
-	 *  - calculate all four profitOrLoss values
-	 *  - return response/positions
-	 */
+	"github.com/gin-gonic/gin"
+)
 
-	return nil
+// func GetUserEquityPositions(adapterType pkg.AdapterType, _ string) []resp.StakePosition {
+// 	_ = ReadMockPositionData() // mockPositions
+// 	_ = ReadMockPriceData()    // mockPrices
+
+// 	/* TODO: Transforms, conversions and calculations
+// 	 *  - transform mockdata/mockpositions to mockdata/mockprices
+// 	 *  - calculate all four profitOrLoss values
+// 	 *  - return response/positions
+// 	 */
+
+// 	return nil
+// }
+
+func NewAdapter(cfg *cfg.Adapter) gin.HandlerFunc {
+	switch cfg.AdapterType {
+	case def.MockAdapter:
+		mock := &adt.MockAdapter{}
+		return mock.Do
+	default:
+		mock := &adt.MockAdapter{}
+		return mock.Do
+	}
 }
