@@ -39,7 +39,8 @@ Here list items that could be done in other ways instead of ways used in the sys
 ## Field mapping
 - `averagePrice` in `equityPositions` are assumed to be the open price of the positions
 - Use field definitions in json file, so `backOfficeAvailableUnits` and `backOfficePortfolioUnits` are used, `availableUnits` and `portfolioUnits` are changed accordingly
-
+## Position identification
+We assume there is only one account, so no account/user information for positions we have. It's easy to scale to support multiple accounts as it mentions in data_manager.go
 
 # More to do
 - There are TODOs which mention they are not finised yet but are on the radar
