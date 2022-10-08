@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
+	resp "StakeBackendGoTest/api/response"
 	log "StakeBackendGoTest/pkg/log"
 )
 
@@ -31,7 +32,10 @@ func Auth(c *gin.Context) {
 	token, ok := c.GetQuery(tokenKey)
 	if !ok || token != testToken {
 		log.Logger.Debug("invalid token", zap.String("ip", ip.String()))
-		c.JSON(http.StatusOK, gin.H{"error_msg": "invalid token"})
+		c.JSON(http.StatusOK, resp.Response{
+			ErrorCode: resp.InvalidToken,
+			Data:      "invalid token",
+		})
 		c.Abort()
 		return
 	}

@@ -125,4 +125,4 @@ We assume there is only one account, so no account/user information for position
 - Fill Dockerfile
 - Create a CI file (say, CircleCI) so that the repo could be managed by CI for deployment, testing, etc.
 - Fill Makefile to help users/CI build/test/deploy the system
-- The system returns the response according to the format required. There is response definition in `response.go` with `err_code` and `err_message` to have a more friendly message for clients.
+- The system returns the response according to the format required. There is a unified response definition in `response.go` with `err_code` and `err_message` to have a more friendly message for clients, which is used when failing to check token (this is for demonstration use as it's not consistent with the postion format we have at present)
