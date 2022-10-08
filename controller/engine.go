@@ -61,12 +61,11 @@ func (e *Engine) Run(ctx context.Context) (<-chan struct{}, error) {
 	done := make(chan struct{}, 2)
 
 	go func() {
-		for {
-			select {
-			case msg := <-dataChan:
-				e.DataManager.OnMessage(msg)
-			}
+		// for ... range is the good option as we only have one data channel at present
+		for msg := range dataChan {
+			e.DataManager.OnMessage(msg)
 		}
+
 	}()
 
 	go func() {
@@ -80,7 +79,7 @@ func (e *Engine) Run(ctx context.Context) (<-chan struct{}, error) {
 
 	go func() {
 		if err := e.ListenAndServe(); err != nil {
-			log.Logger.Error("failed to start server or it was closed: %v", zap.Error(err))
+			log.Logger.Error("failed to start server or it was closed", zap.Error(err))
 			done <- struct{}{}
 		}
 	}()

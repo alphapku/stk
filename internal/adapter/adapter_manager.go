@@ -25,7 +25,7 @@ func NewAdapterManager(cfg *cfg.Adapter) (*AdapterManager, error) {
 
 	switch cfg.AdapterType {
 	case def.MockAdapter:
-		a.adapter = &MockAdapter{}
+		a.adapter = NewDefaultMockAdapter()
 	default:
 		return nil, ErrAdapterUnknown
 	}

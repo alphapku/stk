@@ -13,3 +13,7 @@ Adatper message1 -> Stake message1
                                    /
 Adatper message2 -> Stake message2
 ```
+
+# Assumptions
+## Mocck
+- We assume that `symbol` in `priceData` is the same as `security` in `equityPositions`

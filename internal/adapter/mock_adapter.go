@@ -5,40 +5,63 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"math/rand"
-	"os"
 	"time"
 
 	mk "StakeBackendGoTest/internal/entity/mock"
 	stk "StakeBackendGoTest/internal/entity/stake"
 	cvt "StakeBackendGoTest/internal/pkg/converters/mock"
 	log "StakeBackendGoTest/pkg/log"
+
+	"go.uber.org/zap"
 )
 
 const (
-	maxMessageSent = 10
-	dataInterval   = 3 * time.Second
+	maxMessageSent = 20              // change this for longer mocking
+	dataInterval   = 3 * time.Second // change this for faster mocking
 )
 
 type MockAdapter struct {
-	file *os.File
+	mockMsgCount int
+	msgInterval  time.Duration
+
+	stkPositions []*stk.Position
+	stkPrices    []*stk.Price
 }
 
-func (f *MockAdapter) Close(ctx context.Context) {
-	f.file.Close()
+func NewMockAdapter(mockMsgCount int, msgInterval time.Duration) *MockAdapter {
+	return &MockAdapter{
+		mockMsgCount: mockMsgCount,
+		msgInterval:  msgInterval,
+		stkPositions: make([]*stk.Position, 0),
+		stkPrices:    make([]*stk.Price, 0),
+	}
 }
 
-func (f *MockAdapter) Start(ctx context.Context, dataChan chan interface{}) (<-chan struct{}, error) {
+func NewDefaultMockAdapter() *MockAdapter {
+	return NewMockAdapter(maxMessageSent, dataInterval)
+}
+
+func (m *MockAdapter) Close(ctx context.Context) {
+}
+
+func (m *MockAdapter) loadAndParseMockData() {
 	positions := readMockPositionData()
-	stkPositions := make([]*stk.Position, len(positions.Positions))
-	for i, pos := range positions.Positions {
-		stkPositions[i] = cvt.ToStakePosition(pos)
+	for _, pos := range positions.Positions {
+		if o, err := cvt.ToStakePosition(pos); err == nil {
+			m.stkPositions = append(m.stkPositions, o)
+		} else {
+			log.Logger.Debug("failed to convert", zap.String("symbol", pos.Security), zap.Error(err))
+		}
 	}
 
 	prices := readMockPriceData()
-	stkPrices := make([]*stk.Price, len(prices.Prices))
-	for i, prx := range prices.Prices {
-		stkPrices[i] = cvt.ToStakePrice(prx)
+	for _, prx := range prices.Prices {
+		m.stkPrices = append(m.stkPrices, cvt.ToStakePrice(prx))
 	}
+}
+
+func (m *MockAdapter) Start(ctx context.Context, dataChan chan interface{}) (<-chan struct{}, error) {
+	m.loadAndParseMockData()
 
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
@@ -59,9 +82,9 @@ func (f *MockAdapter) Start(ctx context.Context, dataChan chan interface{}) (<-c
 				return
 			case <-ticker.C:
 				if r1.Intn(100) > 66 {
-					dataChan <- stkPositions
+					dataChan <- m.stkPositions
 				} else {
-					dataChan <- stkPrices
+					dataChan <- m.stkPrices
 				}
 			}
 		}
