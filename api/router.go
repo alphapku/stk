@@ -7,8 +7,12 @@ import (
 	mdl "StakeBackendGoTest/internal/model"
 )
 
+const (
+	equityPositionURI = "/api/equityPositions"
+)
+
 func AddRouters(e *gin.Engine, d *mdl.DataManager) {
 	e.Use(mdw.Auth, mdw.Trace)
 
-	e.GET("/api/equityPositions", d.DoEquityPositions)
+	e.POST(equityPositionURI, d.DoEquityPositions)
 }
