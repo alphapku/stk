@@ -13,6 +13,6 @@ type Position struct {
 	SecurityDescription string          `json:"securityDescription"`
 	Cost                decimal.Decimal `json:"cost"`
 	AveragePrice        decimal.Decimal `json:"averagePrice"`
-	AvailableUnits      int             `json:"availableUnits"`
-	PortfolioUnits      int             `json:"portfolioUnits"`
+	AvailableUnits      int             `json:"backOfficeAvailableUnits"`
+	PortfolioUnits      int             `json:"backOfficePortfolioUnits"`
 }
