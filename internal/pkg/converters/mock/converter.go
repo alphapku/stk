@@ -17,13 +17,14 @@ func ToStakePosition(p *mk.Position) (*stk.Position, error) {
 	if p.AveragePrice.IsZero() {
 		return nil, ErrZeroAveragePrice
 	}
+
 	return &stk.Position{
 		Symbol:                 p.Security,
 		Name:                   p.SecurityDescription,
-		OpenQty:                p.Cost.Div(p.AveragePrice),
 		AvailableForTradingQty: decimal.NewFromInt(int64(p.AvailableUnits)),
 		AveragePrice:           p.AveragePrice,
 		Cost:                   p.Cost,
+		OpenQty:                decimal.NewFromInt(int64(p.PortfolioUnits)),
 	}, nil
 }
 

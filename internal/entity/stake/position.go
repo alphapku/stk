@@ -5,8 +5,19 @@ import "github.com/shopspring/decimal"
 type Position struct {
 	Symbol                 string
 	Name                   string
-	OpenQty                decimal.Decimal
 	AvailableForTradingQty decimal.Decimal
 	AveragePrice           decimal.Decimal
 	Cost                   decimal.Decimal
+	OpenQty                decimal.Decimal // the current volume
+	// PriorQty               decimal.Decimal
+}
+
+func (p Position) Equal(other Position) bool {
+	return p.Symbol == other.Symbol &&
+		p.Name == other.Name &&
+		p.AvailableForTradingQty.Equal(other.AvailableForTradingQty) &&
+		p.AveragePrice.Equal(other.AveragePrice) &&
+		p.Cost.Equal(other.Cost) &&
+		p.OpenQty.Equal(other.OpenQty)
+	// p.PriorQty.Equal(other.PriorQty)
 }

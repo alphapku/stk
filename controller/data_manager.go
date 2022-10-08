@@ -91,16 +91,16 @@ func (d *DataManager) calcStakePosition(pos *stk.Position, prx *stk.Price) {
 	mktValue := pos.OpenQty.Mul(mktPrice)
 	mktValueStr := mktValue.StringFixed(satoshiDecimalPlaces)
 
-	priorValue := pos.OpenQty.Mul(prx.PriorClose)
-	priorClose := prx.PriorClose.StringFixed(satoshiDecimalPlaces)
+	priorValue := prx.PriorClose.Mul(pos.AvailableForTradingQty)
+	priorCloseStr := prx.PriorClose.StringFixed(satoshiDecimalPlaces)
 
 	dayPNL := mktValue.Sub(priorValue)
-	dayPNLStr := mktValue.Sub(priorValue).StringFixed(satoshiDecimalPlaces)
+	dayPNLStr := dayPNL.StringFixed(satoshiDecimalPlaces)
 	dayPNLPCT := dayPNL.Div(priorValue).Mul(pctMultiplier)
 	dayPNLPCTStr := dayPNLPCT.StringFixed(pctDecimalPlaces)
 
 	totalPNL := mktValue.Sub(pos.Cost)
-	totalPNLStr := mktValue.Sub(pos.Cost).StringFixed(satoshiDecimalPlaces)
+	totalPNLStr := totalPNL.StringFixed(satoshiDecimalPlaces)
 	totalPNLPCT := totalPNL.Div(pos.Cost).Mul(pctMultiplier)
 	totalPNLPCTStr := totalPNLPCT.StringFixed(pctDecimalPlaces)
 
@@ -111,7 +111,7 @@ func (d *DataManager) calcStakePosition(pos *stk.Position, prx *stk.Price) {
 		// stkPos.AveragePrice = pos.AveragePrice.String()
 		stkPos.MarketValue = mktValueStr
 		stkPos.MarketPrice = mktPriceStr
-		stkPos.PriorClose = priorClose
+		// stkPos.PriorClose = priorCloseStr
 		stkPos.DayProfitOrLoss = dayPNLStr
 		stkPos.DayProfitOrLossPercent = dayPNLPCTStr
 		stkPos.TotalProfitOrLoss = totalPNLStr
@@ -128,7 +128,7 @@ func (d *DataManager) calcStakePosition(pos *stk.Position, prx *stk.Price) {
 			AveragePrice:             pos.AveragePrice.StringFixed(satoshiDecimalPlaces),
 			MarketValue:              mktValueStr,
 			MarketPrice:              mktPriceStr,
-			PriorClose:               priorClose,
+			PriorClose:               priorCloseStr,
 			DayProfitOrLoss:          dayPNLStr,
 			DayProfitOrLossPercent:   dayPNLPCTStr,
 			TotalProfitOrLoss:        totalPNLStr,
@@ -139,12 +139,19 @@ func (d *DataManager) calcStakePosition(pos *stk.Position, prx *stk.Price) {
 	}
 }
 
+func (d *DataManager) DoEquityPositions(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, []string{"hello", "world!"})
+}
+
+// Reset clears all the data DataManager caches
+func (d *DataManager) Reset() {
+	d.positions = make(map[string]*resp.StakePosition)
+	d.internalPositions = make(map[string]*stk.Position)
+	d.internalPrices = make(map[string]*stk.Price)
+}
+
 // calcMarketPrice returns the preferred market price from our agreement.
 // Here, we use the lastTrade
 func calcMarketPrice(prx *stk.Price) decimal.Decimal {
 	return prx.LastTrade
-}
-
-func (d *DataManager) DoEquityPositions(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, []string{"hello", "world!"})
 }

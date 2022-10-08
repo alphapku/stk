@@ -16,6 +16,9 @@ Here are the key components of the system
 - AdapterManager, responsible for specific adapters management
   - MockerAdapter, an adapter for demonstration use
   - ...
+### Float calculation/display
+- The built-in `float` or `double` are not suitable for currency calculation as the known precision issue in computer, so `shopstring.decimal` is used.
+- In crypto, 1e-8 is referred as a `Satoshi`, the smallest unit, so we use 8 decimal places for price, volume, and value display though it's integer in Mock for volume.
 
 # Test
  - Try to cover corner cases
@@ -31,6 +34,8 @@ Here list items that could be done in other ways instead of ways used in the sys
     - Use the mid-price of the bid and the ask
     - Use the worse price: If you are long, the bid is used; if you are short, the ask is used
     - Use the last traded price. In our system, this is used
+- We get the current volume in the positionWith from `PortfolioUnits` in mock Position.
+- 2 decimal place are used for percent showning, so if a value in terms of percentage is, e.g., 10.12%, the shown value is "10.12".
 ## Field mapping
 - `averagePrice` in `equityPositions` are assumed to be the open price of the positions
 - Use field definitions in json file, so `backOfficeAvailableUnits` and `backOfficePortfolioUnits` are used, `availableUnits` and `portfolioUnits` are changed accordingly

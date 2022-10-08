@@ -55,10 +55,10 @@ func (s *converterTestSuite) TestPositionConverter() {
 			expectedPos: &stk.Position{
 				Symbol:                 "APT.ASX",
 				Name:                   "Afterpay Limited",
-				OpenQty:                decimal.NewFromFloat(10.0000),
 				AvailableForTradingQty: decimal.NewFromFloat(10.0000),
 				AveragePrice:           decimal.NewFromFloat(102.5000),
 				Cost:                   decimal.NewFromFloat(1025.0000),
+				OpenQty:                decimal.NewFromFloat(10.0000),
 			},
 			expectedErr: nil,
 		},
@@ -69,15 +69,7 @@ func (s *converterTestSuite) TestPositionConverter() {
 		if test.expectedErr != nil {
 			s.ErrorIs(err, test.expectedErr)
 		} else {
-			s.Equal(test.expectedPos.Symbol, actual.Symbol)
-			s.Equal(test.expectedPos.Name, actual.Name)
-			// kind of silly, as decimal equality comparison failed for something like with `s.Equal(d1, d2)`
-			// 	d1 := decimal.New(100, 1)
-			//  d2 := decimal.New(1000, 0)
-			s.Assert().Equal(test.expectedPos.OpenQty.Equal(actual.OpenQty), true)
-			s.Assert().Equal(test.expectedPos.AvailableForTradingQty.Equal(actual.AvailableForTradingQty), true)
-			s.Assert().Equal(test.expectedPos.AveragePrice.Equal(actual.AveragePrice), true)
-			s.Assert().Equal(test.expectedPos.Cost.Equal(actual.Cost), true)
+			s.Equal(test.expectedPos.Equal(*actual), true)
 		}
 	}
 }

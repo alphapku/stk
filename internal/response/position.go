@@ -10,8 +10,8 @@ type StakePosition struct {
 	OpenQty                  string `json:"openQty"`
 	AvailableForTradingQty   string `json:"availableForTradingQty"`
 	AveragePrice             string `json:"averagePrice"`
-	MarketValue              string `json:"marketValue"`
-	MarketPrice              string `json:"marketPrice"` // hint: lastTrade price
+	MarketValue              string `json:"marketValue"` // = OpenQty * MarketPrice
+	MarketPrice              string `json:"marketPrice"` // lastTrade price
 	PriorClose               string `json:"priorClose"`
 	DayProfitOrLoss          string `json:"dayProfitOrLoss"`
 	DayProfitOrLossPercent   string `json:"dayProfitOrLossPercent"`

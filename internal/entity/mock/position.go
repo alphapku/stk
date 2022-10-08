@@ -14,5 +14,5 @@ type Position struct {
 	Cost                decimal.Decimal `json:"cost"`
 	AveragePrice        decimal.Decimal `json:"averagePrice"`
 	AvailableUnits      int             `json:"backOfficeAvailableUnits"`
-	PortfolioUnits      int             `json:"backOfficePortfolioUnits"`
+	PortfolioUnits      int             `json:"backOfficePortfolioUnits"` // the current volume
 }
