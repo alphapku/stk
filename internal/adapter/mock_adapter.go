@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	maxMessageSent = 20              // change this for longer mocking
+	maxMessageSent = 1000            // change this for longer mocking
 	dataInterval   = 3 * time.Second // change this for faster mocking
 )
 

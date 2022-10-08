@@ -11,6 +11,7 @@ import (
 	// "StakeBackendGoTest/api"
 	cfg "StakeBackendGoTest/configs"
 	adt "StakeBackendGoTest/internal/adapter"
+	mdl "StakeBackendGoTest/internal/model"
 	log "StakeBackendGoTest/pkg/log"
 )
 
@@ -25,14 +26,14 @@ type Engine struct {
 
 	cfg *cfg.Config
 
-	DataManager    *DataManager
+	DataManager    *mdl.DataManager
 	adapterManager *adt.AdapterManager
 }
 
 func NewEngine(cfg *cfg.Config) *Engine {
 	e := &Engine{
 		Engine:      gin.New(),
-		DataManager: NewDataManager(),
+		DataManager: mdl.NewDataManager(),
 		cfg:         cfg,
 	}
 
