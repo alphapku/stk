@@ -3,12 +3,13 @@ package adapter
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"time"
 
 	mk "StakeBackendGoTest/internal/entity/mock"
-	stk "StakeBackendGoTest/internal/entity/stake"
+	intl "StakeBackendGoTest/internal/entity/stake"
 	cvt "StakeBackendGoTest/internal/pkg/converters/mock"
 	log "StakeBackendGoTest/pkg/log"
 
@@ -24,16 +25,16 @@ type MockAdapter struct {
 	mockMsgCount int
 	msgInterval  time.Duration
 
-	stkPositions []*stk.InternalPosition
-	stkPrices    []*stk.InternalPrice
+	intlPositions []*intl.InternalPosition
+	intlPrices    []*intl.InternalPrice
 }
 
 func NewMockAdapter(mockMsgCount int, msgInterval time.Duration) *MockAdapter {
 	return &MockAdapter{
-		mockMsgCount: mockMsgCount,
-		msgInterval:  msgInterval,
-		stkPositions: make([]*stk.InternalPosition, 0),
-		stkPrices:    make([]*stk.InternalPrice, 0),
+		mockMsgCount:  mockMsgCount,
+		msgInterval:   msgInterval,
+		intlPositions: make([]*intl.InternalPosition, 0),
+		intlPrices:    make([]*intl.InternalPrice, 0),
 	}
 }
 
@@ -44,24 +45,8 @@ func NewDefaultMockAdapter() *MockAdapter {
 func (m *MockAdapter) Close(ctx context.Context) {
 }
 
-func (m *MockAdapter) loadAndParseMockData() {
-	positions := readMockPositionData()
-	for _, pos := range positions.Positions {
-		if o, err := cvt.ToStakePosition(pos); err == nil {
-			m.stkPositions = append(m.stkPositions, o)
-		} else {
-			log.Logger.Debug("failed to convert", zap.String("symbol", pos.Security), zap.Error(err))
-		}
-	}
-
-	prices := readMockPriceData()
-	for _, prx := range prices.Prices {
-		m.stkPrices = append(m.stkPrices, cvt.ToStakePrice(prx))
-	}
-}
-
 func (m *MockAdapter) Start(ctx context.Context, dataChan chan interface{}) (<-chan struct{}, error) {
-	m.loadAndParseMockData()
+	m.intlPositions, m.intlPrices = LoadAndParseMockData("../../")
 
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
@@ -82,9 +67,9 @@ func (m *MockAdapter) Start(ctx context.Context, dataChan chan interface{}) (<-c
 				return
 			case <-ticker.C:
 				if r1.Intn(100) > 66 {
-					dataChan <- m.stkPositions
+					dataChan <- m.intlPositions
 				} else {
-					dataChan <- m.stkPrices
+					dataChan <- m.intlPrices
 				}
 			}
 		}
@@ -93,15 +78,35 @@ func (m *MockAdapter) Start(ctx context.Context, dataChan chan interface{}) (<-c
 	return done, nil
 }
 
-func readMockPositionData() mk.Positions {
-	file, _ := ioutil.ReadFile("../../internal/adapter/mockdata/mockpositions.json")
+func LoadAndParseMockData(dir string) ([]*intl.InternalPosition, []*intl.InternalPrice) {
+	intlPositions := make([]*intl.InternalPosition, 0)
+	intlPrices := make([]*intl.InternalPrice, 0)
+	positions := ReadMockPositionData(dir)
+	for _, pos := range positions.Positions {
+		if o, err := cvt.ToStakePosition(pos); err == nil {
+			intlPositions = append(intlPositions, o)
+		} else {
+			log.Logger.Debug("failed to convert", zap.String("symbol", pos.Security), zap.Error(err))
+		}
+	}
+
+	prices := ReadMockPriceData(dir)
+	for _, prx := range prices.Prices {
+		intlPrices = append(intlPrices, cvt.ToStakePrice(prx))
+	}
+
+	return intlPositions, intlPrices
+}
+
+func ReadMockPositionData(dir string) mk.Positions {
+	file, _ := ioutil.ReadFile(fmt.Sprintf("%sinternal/adapter/mockdata/mockpositions.json", dir))
 	data := mk.Positions{}
 	_ = json.Unmarshal([]byte(file), &data)
 	return data
 }
 
-func readMockPriceData() mk.Prices {
-	file, _ := ioutil.ReadFile("../../internal/adapter/mockdata/mockprices.json")
+func ReadMockPriceData(dir string) mk.Prices {
+	file, _ := ioutil.ReadFile(fmt.Sprintf("%sinternal/adapter/mockdata/mockprices.json", dir))
 	data := mk.Prices{}
 	_ = json.Unmarshal([]byte(file), &data)
 	return data

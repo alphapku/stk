@@ -140,7 +140,12 @@ func (d *DataManager) calcStakePosition(pos *stk.InternalPosition, prx *stk.Inte
 }
 
 func (d *DataManager) DoEquityPositions(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, d.positions)
+	ctx.JSON(http.StatusOK, resp.Response{
+		ErrorCode: 0,
+		Data: resp.StakePositions{
+			StakePositions: d.positions,
+		},
+	})
 }
 
 // Reset clears all the data DataManager caches

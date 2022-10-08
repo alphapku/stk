@@ -9,7 +9,6 @@ type InternalPosition struct {
 	AveragePrice           decimal.Decimal
 	Cost                   decimal.Decimal
 	OpenQty                decimal.Decimal // the current volume
-	// PriorQty               decimal.Decimal
 }
 
 func (p InternalPosition) Equal(other InternalPosition) bool {
@@ -19,5 +18,4 @@ func (p InternalPosition) Equal(other InternalPosition) bool {
 		p.AveragePrice.Equal(other.AveragePrice) &&
 		p.Cost.Equal(other.Cost) &&
 		p.OpenQty.Equal(other.OpenQty)
-	// p.PriorQty.Equal(other.PriorQty)
 }

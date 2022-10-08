@@ -80,7 +80,7 @@ func (s *dataManagerTestSuite) TestDataManager() {
 
 	s.Equal(len(s.d.positions), 1)
 
-	s.Equal(expectedRespPosition, *s.d.positions[stkPosition.Symbol])
+	s.Equal(expectedRespPosition, *s.d.positions[0])
 }
 
 func (s *dataManagerTestSuite) OnStkPosition(symbol, name string) *stk.InternalPosition {

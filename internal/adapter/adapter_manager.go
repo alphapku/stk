@@ -14,14 +14,10 @@ var (
 
 type AdapterManager struct {
 	adapter Adapter
-
-	// dataChan chan interface{}
 }
 
 func NewAdapterManager(cfg *cfg.Adapter) (*AdapterManager, error) {
-	a := &AdapterManager{
-		// dataChan: make(chan interface{}, dataChanLen),
-	}
+	a := &AdapterManager{}
 
 	switch cfg.AdapterType {
 	case def.MockAdapter:
