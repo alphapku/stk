@@ -22,8 +22,8 @@ func (s *adapterManagerTestSuite) SetupSuite() {
 func (s *adapterManagerTestSuite) TestAdapterManagerCancelled() {
 	cfg := &cfg.Adapter{
 		AdapterType:     def.CoinbaseAdapter,
-		MockMsgCount:    2,
-		MsgIntervalSecs: 3, // 6 seconds is enough for us to test all here
+		MockMSGCount:    2,
+		MSGIntervalSecs: 3, // 6 seconds is enough for us to test all here
 	}
 
 	m, err := NewAdapterManager(cfg)
@@ -50,8 +50,8 @@ func (s *adapterManagerTestSuite) TestAdapterManagerCancelled() {
 func (s *adapterManagerTestSuite) TestAdapterManagerQuitting() {
 	cfg := &cfg.Adapter{
 		AdapterType:     def.MockAdapter,
-		MockMsgCount:    0,
-		MsgIntervalSecs: 0,
+		MockMSGCount:    0,
+		MSGIntervalSecs: 0,
 	}
 
 	m, _ := NewAdapterManager(cfg)
@@ -61,7 +61,7 @@ func (s *adapterManagerTestSuite) TestAdapterManagerQuitting() {
 	dataChan := make(chan interface{}, 10)
 	done, _ := m.Start(ctx, dataChan)
 
-	// we don't call cancel, the mocker quits with the zero MockMsgCount
+	// we don't call cancel, the mocker quits with the zero MockMSGCount
 	<-done
 }
 

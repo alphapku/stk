@@ -5,7 +5,9 @@ import (
 )
 
 type Adapter struct {
-	AdapterType def.AdapterType `json:"adapter" yml:"adapter"`
+	AdapterType     def.AdapterType `json:"adapter" yml:"adapter"`
+	MockMSGCount    int             `json:"mock_msg_count" yml:"mock_msg_count"`
+	MSGIntervalSecs int             `json:"msg_interval_secs" yml:"msg_interval_secs"`
 }
 
 type Config struct {

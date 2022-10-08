@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	mk "StakeBackendGoTest/internal/entity/mock"
-	stk "StakeBackendGoTest/internal/entity/stake"
+	intl "StakeBackendGoTest/internal/entity/stake"
 )
 
 type converterTestSuite struct {
@@ -20,7 +20,7 @@ func (s *converterTestSuite) SetupSuite() {
 func (s *converterTestSuite) TestPositionConverter() {
 	tests := []struct {
 		pos         *mk.Position
-		expectedPos *stk.InternalPosition
+		expectedPos *intl.InternalPosition
 		expectedErr error
 	}{{
 		// error case
@@ -32,11 +32,11 @@ func (s *converterTestSuite) TestPositionConverter() {
 			AvailableUnits:      0,
 			PortfolioUnits:      0,
 		},
-		expectedPos: &stk.InternalPosition{
+		expectedPos: &intl.InternalPosition{
 			Symbol:                 "",
 			Name:                   "",
-			OpenQty:                decimal.Decimal{},
-			AvailableForTradingQty: decimal.Decimal{},
+			OpenQTY:                decimal.Decimal{},
+			AvailableForTradingQTY: decimal.Decimal{},
 			AveragePrice:           decimal.Decimal{},
 			Cost:                   decimal.Decimal{},
 		},
@@ -52,13 +52,13 @@ func (s *converterTestSuite) TestPositionConverter() {
 				AvailableUnits:      10,
 				PortfolioUnits:      10,
 			},
-			expectedPos: &stk.InternalPosition{
+			expectedPos: &intl.InternalPosition{
 				Symbol:                 "APT.ASX",
 				Name:                   "Afterpay Limited",
-				AvailableForTradingQty: decimal.NewFromFloat(10.0000),
+				AvailableForTradingQTY: decimal.NewFromFloat(10.0000),
 				AveragePrice:           decimal.NewFromFloat(102.5000),
 				Cost:                   decimal.NewFromFloat(1025.0000),
-				OpenQty:                decimal.NewFromFloat(10.0000),
+				OpenQTY:                decimal.NewFromFloat(10.0000),
 			},
 			expectedErr: nil,
 		},

@@ -6,6 +6,7 @@ import (
 
 	cfg "StakeBackendGoTest/configs"
 	def "StakeBackendGoTest/pkg/const"
+	log "StakeBackendGoTest/pkg/log"
 )
 
 var (
@@ -21,7 +22,7 @@ func NewAdapterManager(cfg *cfg.Adapter) (*AdapterManager, error) {
 
 	switch cfg.AdapterType {
 	case def.MockAdapter:
-		a.adapter = NewDefaultMockAdapter()
+		a.adapter = NewMockAdapter(cfg.MockMSGCount, cfg.MSGIntervalSecs)
 	default:
 		return nil, ErrAdapterUnknown
 	}
@@ -40,10 +41,12 @@ func (a *AdapterManager) Start(ctx context.Context, dataChan chan interface{}) (
 	go func() {
 		select {
 		case <-ctx.Done():
+			log.Logger.Debug("cancelling adapters")
 			a.adapter.Close(ctx)
 			c <- struct{}{}
 			return
 		case <-done:
+			log.Logger.Debug("adapters closed")
 			c <- struct{}{}
 			return
 		}

@@ -7,8 +7,8 @@ type StakePositions struct {
 type StakePosition struct {
 	Symbol                   string `json:"symbol"`
 	Name                     string `json:"name"`
-	OpenQty                  string `json:"openQty"`
-	AvailableForTradingQty   string `json:"availableForTradingQty"`
+	OpenQTY                  string `json:"openQty"`
+	AvailableForTradingQTY   string `json:"availableForTradingQty"`
 	AveragePrice             string `json:"averagePrice"`
 	MarketValue              string `json:"marketValue"`
 	MarketPrice              string `json:"marketPrice"`

@@ -20,8 +20,8 @@ import (
 
 // userPositions is the one users are supposed to use when parsing response on the endpoint
 type userPositions struct {
-	ErrorCode    int                  `json:"err_code,omitempty"`
-	ErrorMessage string               `json:"err_message,omitempty"`
+	ErrorCode    int                  `json:"errCode,omitempty"`
+	ErrorMessage string               `json:"errMessage,omitempty"`
 	Data         *resp.StakePositions `json:"data"`
 }
 
@@ -49,7 +49,7 @@ func (s *apiTestSuite) TestInvalidToken() {
 	s.Engine.ServeHTTP(recorder, req)
 
 	resp, _ := ioutil.ReadAll(recorder.Body)
-	expected := `{"err_code":-1,"data":"invalid token"}`
+	expected := `{"errCode":-1,"data":"invalid token"}`
 	s.Equal(expected, string(resp))
 }
 

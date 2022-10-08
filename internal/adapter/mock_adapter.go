@@ -16,30 +16,21 @@ import (
 	"go.uber.org/zap"
 )
 
-const (
-	maxMessageSent = 1000            // change this for longer mocking
-	dataInterval   = 3 * time.Second // change this for faster mocking
-)
-
 type MockAdapter struct {
-	mockMsgCount int
+	mockMSGCount int
 	msgInterval  time.Duration
 
 	intlPositions []*intl.InternalPosition
 	intlPrices    []*intl.InternalPrice
 }
 
-func NewMockAdapter(mockMsgCount int, msgInterval time.Duration) *MockAdapter {
+func NewMockAdapter(mockMSGCount int, msgIntervalSecs int) *MockAdapter {
 	return &MockAdapter{
-		mockMsgCount:  mockMsgCount,
-		msgInterval:   msgInterval,
+		mockMSGCount:  mockMSGCount,
+		msgInterval:   time.Duration(msgIntervalSecs) * time.Second,
 		intlPositions: make([]*intl.InternalPosition, 0),
 		intlPrices:    make([]*intl.InternalPrice, 0),
 	}
-}
-
-func NewDefaultMockAdapter() *MockAdapter {
-	return NewMockAdapter(maxMessageSent, dataInterval)
 }
 
 func (m *MockAdapter) Close(ctx context.Context) {
@@ -54,10 +45,10 @@ func (m *MockAdapter) Start(ctx context.Context, dataChan chan interface{}) (<-c
 	done := make(chan struct{})
 	go func() {
 		sent := 0
-		ticker := time.NewTicker(dataInterval)
+		ticker := time.NewTicker(m.msgInterval)
 		for {
-			if sent >= maxMessageSent {
-				log.Logger.Info("mocking data done")
+			if sent >= m.mockMSGCount {
+				log.Logger.Debug("mocking data done")
 				close(done)
 				return
 			}
@@ -86,7 +77,7 @@ func LoadAndParseMockData(dir string) ([]*intl.InternalPosition, []*intl.Interna
 		if o, err := cvt.ToStakePosition(pos); err == nil {
 			intlPositions = append(intlPositions, o)
 		} else {
-			log.Logger.Debug("failed to convert", zap.String("symbol", pos.Security), zap.Error(err))
+			log.Logger.Warn("failed to convert", zap.String("symbol", pos.Security), zap.Error(err))
 		}
 	}
 

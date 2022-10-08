@@ -98,7 +98,7 @@ Here are the key components of the system
 - `GET` is not safe as it exposed params in URL, so it's changd to `POST`
 
 ## Response Format
-- A unified response structure in `response.go` with `err_code` and `err_message` is introduced with more info to let users know what happens when it fails
+- A unified response structure in `response.go` with `errCode` and `errMessage` is introduced with more info to let users know what happens when it fails
 
 ## Logging Process
 - `zap` is introduced as it has much higher performance, and more flexible usages compared to the built-in log

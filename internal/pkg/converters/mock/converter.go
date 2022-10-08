@@ -6,30 +6,30 @@ import (
 	"github.com/shopspring/decimal"
 
 	mk "StakeBackendGoTest/internal/entity/mock"
-	stk "StakeBackendGoTest/internal/entity/stake"
+	intl "StakeBackendGoTest/internal/entity/stake"
 )
 
 var (
 	ErrZeroAveragePrice = errors.New("average is zero")
 )
 
-func ToStakePosition(p *mk.Position) (*stk.InternalPosition, error) {
+func ToStakePosition(p *mk.Position) (*intl.InternalPosition, error) {
 	if p.AveragePrice.IsZero() {
 		return nil, ErrZeroAveragePrice
 	}
 
-	return &stk.InternalPosition{
+	return &intl.InternalPosition{
 		Symbol:                 p.Security,
 		Name:                   p.SecurityDescription,
-		AvailableForTradingQty: decimal.NewFromInt(int64(p.AvailableUnits)),
+		AvailableForTradingQTY: decimal.NewFromInt(int64(p.AvailableUnits)),
 		AveragePrice:           p.AveragePrice,
 		Cost:                   p.Cost,
-		OpenQty:                decimal.NewFromInt(int64(p.PortfolioUnits)),
+		OpenQTY:                decimal.NewFromInt(int64(p.PortfolioUnits)),
 	}, nil
 }
 
-func ToStakePrice(p *mk.Price) *stk.InternalPrice {
-	return &stk.InternalPrice{
+func ToStakePrice(p *mk.Price) *intl.InternalPrice {
+	return &intl.InternalPrice{
 		Symbol:     p.Symbol,
 		LastTrade:  p.LastTrade,
 		Bid:        p.Bid,
