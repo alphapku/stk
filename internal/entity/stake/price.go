@@ -2,7 +2,7 @@ package stake
 
 import "github.com/shopspring/decimal"
 
-type Price struct {
+type InternalPrice struct {
 	Symbol     string
 	LastTrade  decimal.Decimal
 	Bid        decimal.Decimal
@@ -10,7 +10,7 @@ type Price struct {
 	PriorClose decimal.Decimal
 }
 
-func (p Price) Equal(other Price) bool {
+func (p InternalPrice) Equal(other InternalPrice) bool {
 	return p.Symbol == other.Symbol &&
 		p.LastTrade.Equal(other.LastTrade) &&
 		p.Bid.Equal(other.Bid) &&

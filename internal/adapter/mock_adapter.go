@@ -24,16 +24,16 @@ type MockAdapter struct {
 	mockMsgCount int
 	msgInterval  time.Duration
 
-	stkPositions []*stk.Position
-	stkPrices    []*stk.Price
+	stkPositions []*stk.InternalPosition
+	stkPrices    []*stk.InternalPrice
 }
 
 func NewMockAdapter(mockMsgCount int, msgInterval time.Duration) *MockAdapter {
 	return &MockAdapter{
 		mockMsgCount: mockMsgCount,
 		msgInterval:  msgInterval,
-		stkPositions: make([]*stk.Position, 0),
-		stkPrices:    make([]*stk.Price, 0),
+		stkPositions: make([]*stk.InternalPosition, 0),
+		stkPrices:    make([]*stk.InternalPrice, 0),
 	}
 }
 

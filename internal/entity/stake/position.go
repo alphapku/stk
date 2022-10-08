@@ -2,7 +2,7 @@ package stake
 
 import "github.com/shopspring/decimal"
 
-type Position struct {
+type InternalPosition struct {
 	Symbol                 string
 	Name                   string
 	AvailableForTradingQty decimal.Decimal
@@ -12,7 +12,7 @@ type Position struct {
 	// PriorQty               decimal.Decimal
 }
 
-func (p Position) Equal(other Position) bool {
+func (p InternalPosition) Equal(other InternalPosition) bool {
 	return p.Symbol == other.Symbol &&
 		p.Name == other.Name &&
 		p.AvailableForTradingQty.Equal(other.AvailableForTradingQty) &&

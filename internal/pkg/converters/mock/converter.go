@@ -13,12 +13,12 @@ var (
 	ErrZeroAveragePrice = errors.New("average is zero")
 )
 
-func ToStakePosition(p *mk.Position) (*stk.Position, error) {
+func ToStakePosition(p *mk.Position) (*stk.InternalPosition, error) {
 	if p.AveragePrice.IsZero() {
 		return nil, ErrZeroAveragePrice
 	}
 
-	return &stk.Position{
+	return &stk.InternalPosition{
 		Symbol:                 p.Security,
 		Name:                   p.SecurityDescription,
 		AvailableForTradingQty: decimal.NewFromInt(int64(p.AvailableUnits)),
@@ -28,8 +28,8 @@ func ToStakePosition(p *mk.Position) (*stk.Position, error) {
 	}, nil
 }
 
-func ToStakePrice(p *mk.Price) *stk.Price {
-	return &stk.Price{
+func ToStakePrice(p *mk.Price) *stk.InternalPrice {
+	return &stk.InternalPrice{
 		Symbol:     p.Symbol,
 		LastTrade:  p.LastTrade,
 		Bid:        p.Bid,

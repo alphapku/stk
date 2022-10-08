@@ -7,11 +7,11 @@ All messages from different sources have to be converted into Stake's format. Th
 
 So, basically, the data conversion  happens in this way:
 ```
-Adatper message1 -> Stake message1
+Adatper message1 -> internal Stake message1
                                    \
-                                    Combined Stake Message for clients
+                                    reponse Stake Message for clients
                                    /
-Adatper message2 -> Stake message2
+Adatper message2 -> internal Stake message2
 ```
 
 # Assumptions

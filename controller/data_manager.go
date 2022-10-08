@@ -26,38 +26,39 @@ var (
 type DataManager struct {
 	// positions map[string]map[string]*resp.StakePosition
 
-	// stakePositions map[string]map[string]*stk.Position
-	// stakePrices    map[string]map[string]*stk.Price
+	// stakePositions map[string]map[string]*stk.InternalPosition
+	// stakePrices    map[string]map[string]*stk.InternalPrice
 
 	// TODO, we do not save user info, so here let's assume the sytem is running for a dedicated user only.
 	// Use the structures above with the outer map's key as account ID if running to support multiple users
+	// By adding account info in internal positions, it could be scale easily
 	positions map[string]*resp.StakePosition
 
-	internalPositions map[string]*stk.Position
-	internalPrices    map[string]*stk.Price
+	internalPositions map[string]*stk.InternalPosition
+	internalPrices    map[string]*stk.InternalPrice
 }
 
 func NewDataManager() *DataManager {
 	return &DataManager{
 		positions: make(map[string]*resp.StakePosition),
 
-		internalPositions: make(map[string]*stk.Position),
-		internalPrices:    make(map[string]*stk.Price),
+		internalPositions: make(map[string]*stk.InternalPosition),
+		internalPrices:    make(map[string]*stk.InternalPrice),
 	}
 }
 
 func (d *DataManager) OnMessage(msg interface{}) {
 	switch m := msg.(type) {
-	case []*stk.Position:
+	case []*stk.InternalPosition:
 		d.onMarketPositions(m)
-	case []*stk.Price:
+	case []*stk.InternalPrice:
 		d.onMarketPrices(m)
 	default:
 		log.Logger.Warn("unexpected msg", zap.String("type", fmt.Sprintf("%T", m)))
 	}
 }
 
-func (d *DataManager) onMarketPositions(positions []*stk.Position) {
+func (d *DataManager) onMarketPositions(positions []*stk.InternalPosition) {
 	log.Logger.Debug("position(s) received", zap.Int("count", len(positions)))
 	for _, pos := range positions {
 		// save the position info, as we need them to calculate StakePosition when prices are updated
@@ -70,7 +71,7 @@ func (d *DataManager) onMarketPositions(positions []*stk.Position) {
 	}
 }
 
-func (d *DataManager) onMarketPrices(prices []*stk.Price) {
+func (d *DataManager) onMarketPrices(prices []*stk.InternalPrice) {
 	log.Logger.Debug("price(s) received", zap.Int("count", len(prices)))
 	for _, prx := range prices {
 		// save the price info, as we need them to calculate StakePosition when positions are updated
@@ -83,7 +84,7 @@ func (d *DataManager) onMarketPrices(prices []*stk.Price) {
 	}
 }
 
-func (d *DataManager) calcStakePosition(pos *stk.Position, prx *stk.Price) {
+func (d *DataManager) calcStakePosition(pos *stk.InternalPosition, prx *stk.InternalPrice) {
 	availForTrddingQty := pos.AvailableForTradingQty.StringFixed(satoshiDecimalPlaces)
 
 	mktPrice := calcMarketPrice(prx)
@@ -146,12 +147,12 @@ func (d *DataManager) DoEquityPositions(ctx *gin.Context) {
 // Reset clears all the data DataManager caches
 func (d *DataManager) Reset() {
 	d.positions = make(map[string]*resp.StakePosition)
-	d.internalPositions = make(map[string]*stk.Position)
-	d.internalPrices = make(map[string]*stk.Price)
+	d.internalPositions = make(map[string]*stk.InternalPosition)
+	d.internalPrices = make(map[string]*stk.InternalPrice)
 }
 
 // calcMarketPrice returns the preferred market price from our agreement.
 // Here, we use the lastTrade
-func calcMarketPrice(prx *stk.Price) decimal.Decimal {
+func calcMarketPrice(prx *stk.InternalPrice) decimal.Decimal {
 	return prx.LastTrade
 }

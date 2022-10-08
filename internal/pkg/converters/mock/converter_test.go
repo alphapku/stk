@@ -20,7 +20,7 @@ func (s *converterTestSuite) SetupSuite() {
 func (s *converterTestSuite) TestPositionConverter() {
 	tests := []struct {
 		pos         *mk.Position
-		expectedPos *stk.Position
+		expectedPos *stk.InternalPosition
 		expectedErr error
 	}{{
 		// error case
@@ -32,7 +32,7 @@ func (s *converterTestSuite) TestPositionConverter() {
 			AvailableUnits:      0,
 			PortfolioUnits:      0,
 		},
-		expectedPos: &stk.Position{
+		expectedPos: &stk.InternalPosition{
 			Symbol:                 "",
 			Name:                   "",
 			OpenQty:                decimal.Decimal{},
@@ -52,7 +52,7 @@ func (s *converterTestSuite) TestPositionConverter() {
 				AvailableUnits:      10,
 				PortfolioUnits:      10,
 			},
-			expectedPos: &stk.Position{
+			expectedPos: &stk.InternalPosition{
 				Symbol:                 "APT.ASX",
 				Name:                   "Afterpay Limited",
 				AvailableForTradingQty: decimal.NewFromFloat(10.0000),

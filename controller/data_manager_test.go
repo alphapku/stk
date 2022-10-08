@@ -83,8 +83,8 @@ func (s *dataManagerTestSuite) TestDataManager() {
 	s.Equal(expectedRespPosition, *s.d.positions[stkPosition.Symbol])
 }
 
-func (s *dataManagerTestSuite) OnStkPosition(symbol, name string) *stk.Position {
-	stkPosition := &stk.Position{
+func (s *dataManagerTestSuite) OnStkPosition(symbol, name string) *stk.InternalPosition {
+	stkPosition := &stk.InternalPosition{
 		Symbol:                 symbol,
 		Name:                   name,
 		OpenQty:                decimal.NewFromFloat(10.0000),
@@ -93,20 +93,20 @@ func (s *dataManagerTestSuite) OnStkPosition(symbol, name string) *stk.Position 
 		Cost:                   decimal.NewFromFloat(1025.0000),
 	}
 
-	s.d.onMarketPositions([]*stk.Position{stkPosition})
+	s.d.onMarketPositions([]*stk.InternalPosition{stkPosition})
 
 	return stkPosition
 }
 
-func (s *dataManagerTestSuite) OnStkPrice(symbol string) *stk.Price {
-	stkPrice := &stk.Price{
+func (s *dataManagerTestSuite) OnStkPrice(symbol string) *stk.InternalPrice {
+	stkPrice := &stk.InternalPrice{
 		Symbol:     symbol,
 		LastTrade:  decimal.NewFromFloat(114.9800),
 		Bid:        decimal.NewFromFloat(114.98),
 		Ask:        decimal.NewFromFloat(114.99),
 		PriorClose: decimal.NewFromFloat(119.8700),
 	}
-	s.d.onMarketPrices([]*stk.Price{stkPrice})
+	s.d.onMarketPrices([]*stk.InternalPrice{stkPrice})
 
 	return stkPrice
 }
