@@ -1,8 +1,6 @@
-# 0.1 (2022-07-10)
+# 0.1 (2022-10-08)
 
 ### Features and enhancements
+- A basic framework is created
 
-- **API:** 
 
-### Bug fixes
-- **API:**

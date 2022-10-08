@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	// "StakeBackendGoTest/api"
 	cfg "StakeBackendGoTest/configs"
 	adt "StakeBackendGoTest/internal/adapter"
 	mdl "StakeBackendGoTest/internal/model"
