@@ -61,7 +61,7 @@ func (m *MockAdapter) Start(ctx context.Context, dataChan chan interface{}) (<-c
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
-				if r1.Intn(100) > 66 {
+				if r1.Intn(100) > 33 {
 					dataChan <- m.intlPositions
 				} else {
 					dataChan <- m.intlPrices

@@ -16,6 +16,8 @@ import (
 const (
 	pctDecimalPlaces     = 2 // to show pct as xx.xx
 	satoshiDecimalPlaces = 8
+
+	na = "N/A"
 )
 
 var (
@@ -145,9 +147,48 @@ func (d *DataManager) DoEquityPositions(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp.Response{
 		ErrorCode: 0,
 		Data: resp.StakePositions{
-			StakePositions: d.positions,
+			StakePositions: d.getStakePositions(),
 		},
 	})
+}
+
+// getStakePositions returns Stake positions.
+// NB, it's not necessary to be from the real-time data as normally we would use cache
+func (d *DataManager) getStakePositions() []*resp.StakePosition {
+	r := []*resp.StakePosition{}
+
+	for k, v := range d.internalPositions {
+		updated := false
+		for _, p := range d.positions {
+			if p.Symbol == k {
+				r = append(r, p)
+				updated = true
+				break
+			}
+		}
+
+		if !updated {
+			// create an StakePosition from internal position without PNL info
+			n := &resp.StakePosition{
+				Symbol:                   v.Symbol,
+				Name:                     v.Name,
+				OpenQTY:                  v.OpenQTY.StringFixed(satoshiDecimalPlaces),
+				AvailableForTradingQTY:   v.AvailableForTradingQTY.StringFixed(satoshiDecimalPlaces),
+				AveragePrice:             v.AveragePrice.StringFixed(satoshiDecimalPlaces),
+				MarketValue:              na,
+				MarketPrice:              na,
+				PriorClose:               na,
+				DayProfitOrLoss:          na,
+				DayProfitOrLossPercent:   na,
+				TotalProfitOrLoss:        na,
+				TotalProfitOrLossPercent: na,
+			}
+
+			r = append(r, n)
+		}
+	}
+
+	return r
 }
 
 // Reset clears all the data DataManager caches
