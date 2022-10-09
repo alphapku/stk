@@ -97,8 +97,9 @@ Here are the key components of the system
 - The system uses Gin's middleware to authenticate users. The token is moved to the request header for security.
 - `GET` is not safe as it exposed params in URL, so it's changd to `POST`
 
-## Response Format
+## Response
 - A unified response structure in `response.go` with `errCode` and `errMessage` is introduced with more info to let users know what happens when it fails
+- When no prices are available for recieved upstream positions (mock position here), the StakePosition will be delivered with some fields having "N/A" values as they depend on price information
 
 ## Logging Process
 - `zap` is introduced as it has much higher performance, and more flexible usages compared to the built-in log
