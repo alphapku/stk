@@ -19,7 +19,9 @@ func main() {
 	// TODO, load Config from file
 	cfg := &cfg.Config{
 		Adapter: &cfg.Adapter{
-			AdapterType: def.MockAdapter,
+			AdapterType:     def.MockAdapter,
+			MockMSGCount:    1000,
+			MSGIntervalSecs: 3,
 		},
 		Addr:    "localhost:8080",
 		EnvMode: def.DevMode,
