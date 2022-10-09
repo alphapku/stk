@@ -37,7 +37,11 @@ func (m *MockAdapter) Close(ctx context.Context) {
 }
 
 func (m *MockAdapter) Start(ctx context.Context, dataChan chan interface{}) (<-chan struct{}, error) {
-	m.intlPositions, m.intlPrices = LoadAndParseMockData("../../")
+	var err error
+	m.intlPositions, m.intlPrices, err = LoadAndParseMockData("../../")
+	if err != nil {
+		return nil, err
+	}
 
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
@@ -69,10 +73,13 @@ func (m *MockAdapter) Start(ctx context.Context, dataChan chan interface{}) (<-c
 	return done, nil
 }
 
-func LoadAndParseMockData(dir string) ([]*intl.InternalPosition, []*intl.InternalPrice) {
+func LoadAndParseMockData(dir string) ([]*intl.InternalPosition, []*intl.InternalPrice, error) {
+	positions, err := ReadMockPositionData(dir)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	intlPositions := make([]*intl.InternalPosition, 0)
-	intlPrices := make([]*intl.InternalPrice, 0)
-	positions := ReadMockPositionData(dir)
 	for _, pos := range positions.Positions {
 		if o, err := cvt.ToStakePosition(pos); err == nil {
 			intlPositions = append(intlPositions, o)
@@ -81,24 +88,45 @@ func LoadAndParseMockData(dir string) ([]*intl.InternalPosition, []*intl.Interna
 		}
 	}
 
-	prices := ReadMockPriceData(dir)
+	prices, err := ReadMockPriceData(dir)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	intlPrices := make([]*intl.InternalPrice, 0)
 	for _, prx := range prices.Prices {
 		intlPrices = append(intlPrices, cvt.ToStakePrice(prx))
 	}
 
-	return intlPositions, intlPrices
+	return intlPositions, intlPrices, nil
 }
 
-func ReadMockPositionData(dir string) mk.Positions {
-	file, _ := ioutil.ReadFile(fmt.Sprintf("%sinternal/adapter/mockdata/mockpositions.json", dir))
-	data := mk.Positions{}
-	_ = json.Unmarshal([]byte(file), &data)
-	return data
+func ReadMockPositionData(dir string) (*mk.Positions, error) {
+	file, err := ioutil.ReadFile(fmt.Sprintf("%sinternal/adapter/mockdata/mockpositions.json", dir))
+	if err != nil {
+		return nil, err
+	}
+
+	data := &mk.Positions{}
+	err = json.Unmarshal([]byte(file), data)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
-func ReadMockPriceData(dir string) mk.Prices {
-	file, _ := ioutil.ReadFile(fmt.Sprintf("%sinternal/adapter/mockdata/mockprices.json", dir))
-	data := mk.Prices{}
-	_ = json.Unmarshal([]byte(file), &data)
-	return data
+func ReadMockPriceData(dir string) (*mk.Prices, error) {
+	file, err := ioutil.ReadFile(fmt.Sprintf("%sinternal/adapter/mockdata/mockprices.json", dir))
+	if err != nil {
+		return nil, err
+	}
+
+	data := &mk.Prices{}
+	err = json.Unmarshal([]byte(file), data)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
