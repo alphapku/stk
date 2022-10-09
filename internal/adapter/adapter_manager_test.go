@@ -51,7 +51,7 @@ func (s *adapterManagerTestSuite) TestAdapterManagerQuitting() {
 	cfg := &cfg.Adapter{
 		AdapterType:     def.MockAdapter,
 		MockMSGCount:    0,
-		MSGIntervalSecs: 0,
+		MSGIntervalSecs: 1,
 	}
 
 	m, _ := NewAdapterManager(cfg)

@@ -31,44 +31,66 @@ func (s *dataManagerTestSuite) TestDataManager() {
 	)
 
 	// case #1
-	// only Stake position, no price, so the Response position should not be created
-	stkPosition := s.OnStkPosition(symbol, name)
+	// only internal position, no price, so the StakePositions will be delivered but some fields will be "N/A" as they depend on prices
+	p := s.OnInternalPosition(symbol, name)
 	s.Equal(len(s.d.positions), 0)
 	s.Equal(len(s.d.internalPositions), 1)
-	s.Assert().Equal(s.d.internalPositions[stkPosition.Symbol].Equal(*stkPosition), true)
+	intlPosition, ok := s.d.internalPositions[symbol]
+	s.True(ok)
+	s.True(p.Equal(*intlPosition))
+
+	stkPositions := s.d.getStakePositions()
+	s.Equal(len(stkPositions), 1)
+	pos := stkPositions[0]
+
+	s.Equal(pos.Symbol, p.Symbol)
+	s.Equal(pos.Name, p.Name)
+	s.Equal(pos.OpenQTY, p.OpenQTY.StringFixed(satoshiDecimalPlaces))
+	s.Equal(pos.AvailableForTradingQTY, p.AvailableForTradingQTY.StringFixed(satoshiDecimalPlaces))
+	s.Equal(pos.AveragePrice, p.AveragePrice.StringFixed(satoshiDecimalPlaces))
+
+	s.Equal(pos.MarketValue, na)
+	s.Equal(pos.MarketPrice, na)
+	s.Equal(pos.PriorClose, na)
+	s.Equal(pos.DayProfitOrLoss, na)
+	s.Equal(pos.DayProfitOrLossPercent, na)
+	s.Equal(pos.TotalProfitOrLoss, na)
+	s.Equal(pos.TotalProfitOrLossPercent, na)
+
+	s.Assert().Equal(s.d.internalPositions[p.Symbol].Equal(*p), true)
 
 	// case #2
-	// only Stake price, no position, , so the Response position should not be created
+	// only internal price, no position, so the StakePositions should not be created
 	s.d.Reset()
 
-	stkPrice := s.OnStkPrice(symbol)
+	stkPrice := s.OnInternalPrice(symbol)
 	s.Equal(len(s.d.positions), 0)
 	s.Equal(len(s.d.internalPrices), 1)
 	s.Assert().Equal(s.d.internalPrices[stkPrice.Symbol].Equal(*stkPrice), true)
 
 	// case #3
 	// fill position we are supposed to have Response position now
-	stkPosition = s.OnStkPosition(symbol, name)
+	p = s.OnInternalPosition(symbol, name)
 
 	mktPrice := calcMarketPrice(stkPrice)
-	curVolume := stkPosition.Cost.Div(stkPosition.AveragePrice)
+	curVolume := p.Cost.Div(p.AveragePrice)
 	mktValue := mktPrice.Mul(curVolume)
 
-	priorValue := stkPrice.PriorClose.Mul(stkPosition.AvailableForTradingQTY)
+	priorValue := stkPrice.PriorClose.Mul(p.AvailableForTradingQTY)
 	priorClose := stkPrice.PriorClose
 
 	dayPNL := mktValue.Sub(priorValue)
 	dayPNLPCT := dayPNL.Div(priorValue).Mul(pctMultiplier)
 
-	totalPNL := mktValue.Sub(stkPosition.Cost)
-	totalPNLPCT := totalPNL.Div(stkPosition.Cost).Mul(pctMultiplier)
+	totalPNL := mktValue.Sub(p.Cost)
+	totalPNLPCT := totalPNL.Div(p.Cost).Mul(pctMultiplier)
 
 	expectedRespPosition := resp.StakePosition{
 		Symbol:                   symbol,
 		Name:                     name,
-		OpenQTY:                  stkPosition.OpenQTY.StringFixed(satoshiDecimalPlaces),
-		AvailableForTradingQTY:   stkPosition.AvailableForTradingQTY.StringFixed(satoshiDecimalPlaces),
-		AveragePrice:             stkPosition.AveragePrice.StringFixed(satoshiDecimalPlaces),
+		OpenQTY:                  p.OpenQTY.StringFixed(satoshiDecimalPlaces),
+		AvailableForTradingQTY:   p.AvailableForTradingQTY.StringFixed(satoshiDecimalPlaces),
+		AveragePrice:             p.AveragePrice.StringFixed(satoshiDecimalPlaces),
 		MarketValue:              mktValue.StringFixed(satoshiDecimalPlaces),
 		MarketPrice:              mktPrice.StringFixed(satoshiDecimalPlaces),
 		PriorClose:               priorClose.StringFixed(satoshiDecimalPlaces),
@@ -83,8 +105,8 @@ func (s *dataManagerTestSuite) TestDataManager() {
 	s.Equal(expectedRespPosition, *s.d.positions[0])
 }
 
-func (s *dataManagerTestSuite) OnStkPosition(symbol, name string) *intl.InternalPosition {
-	stkPosition := &intl.InternalPosition{
+func (s *dataManagerTestSuite) OnInternalPosition(symbol, name string) *intl.InternalPosition {
+	p := &intl.InternalPosition{
 		Symbol:                 symbol,
 		Name:                   name,
 		OpenQTY:                decimal.NewFromFloat(10.0000),
@@ -93,22 +115,22 @@ func (s *dataManagerTestSuite) OnStkPosition(symbol, name string) *intl.Internal
 		Cost:                   decimal.NewFromFloat(1025.0000),
 	}
 
-	s.d.onMarketPositions([]*intl.InternalPosition{stkPosition})
+	s.d.onMarketPositions([]*intl.InternalPosition{p})
 
-	return stkPosition
+	return p
 }
 
-func (s *dataManagerTestSuite) OnStkPrice(symbol string) *intl.InternalPrice {
-	stkPrice := &intl.InternalPrice{
+func (s *dataManagerTestSuite) OnInternalPrice(symbol string) *intl.InternalPrice {
+	p := &intl.InternalPrice{
 		Symbol:     symbol,
 		LastTrade:  decimal.NewFromFloat(114.9800),
 		Bid:        decimal.NewFromFloat(114.98),
 		Ask:        decimal.NewFromFloat(114.99),
 		PriorClose: decimal.NewFromFloat(119.8700),
 	}
-	s.d.onMarketPrices([]*intl.InternalPrice{stkPrice})
+	s.d.onMarketPrices([]*intl.InternalPrice{p})
 
-	return stkPrice
+	return p
 }
 
 func TestDataManagerTestSuite(t *testing.T) {

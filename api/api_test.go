@@ -72,7 +72,7 @@ func (s *apiTestSuite) TestValidTokenWithoutPositions() {
 }
 
 func (s *apiTestSuite) TestValidTokenWithPositions() {
-	intlPositions, intlPrices := adt.LoadAndParseMockData("../")
+	intlPositions, intlPrices, _ := adt.LoadAndParseMockData("../")
 	// feed some data
 	s.dataManager.Reset()
 	s.dataManager.OnMessage(intlPositions)
