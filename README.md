@@ -1,31 +1,139 @@
-# StakeBackendGoTest
+# Project structure
+```
+.
+├── CHANGELOG.md
+├── Dockerfile
+├── Makefile
+├── README.md
+├── README_MORE.md
+├── api
+│   ├── api_handler.go
+│   ├── error_code.go
+│   ├── form
+│   ├── middleware
+│   │   ├── auth.go
+│   │   └── trace.go
+│   ├── response
+│   │   ├── error_code.go
+│   │   ├── position.go
+│   │   └── response.go
+│   └── router.go
+├── build
+├── cmd
+│   └── service
+│       ├── main.go
+│       ├── main_test.go
+│       └── service
+├── configs
+│   └── config.go
+├── controller
+│   └── engine.go
+├── docs
+├── etc
+│   └── settings.yaml
+├── example
+├── go.mod
+├── go.sum
+├── internal
+│   ├── adapter
+│   │   ├── adapter.go
+│   │   ├── adapter_manager.go
+│   │   ├── mock_adapter.go
+│   │   ├── mock_adapter_test.go
+│   │   └── mockdata
+│   │       ├── mockpositions.json
+│   │       └── mockprices.json
+│   ├── entity
+│   │   ├── README.md
+│   │   ├── mock
+│   │   │   ├── position.go
+│   │   │   └── price.go
+│   │   └── stake
+│   │       ├── position.go
+│   │       └── price.go
+│   ├── model
+│   │   ├── data_manager.go
+│   │   └── data_manager_test.go
+│   └── pkg
+│       └── converters
+│           ├── README.md
+│           └── mock
+│               ├── converter.go
+│               └── converter_test.go
+├── pkg
+│   ├── const
+│   │   └── def.go
+│   └── log
+│       └── log.go
+├── scripts
+└── test
+```
 
-Welcome to the Stake Backend Developer Go Test. Thanks for taking the time to complete this, we're keen to see how you do!
+The task was done from the point of view of implementing a system which could be scaled or maintaned earsier, instead of only for the purpose of finishing the task. So some empty directories were created though probably there are no files in them.
+  - docs
+  - etc
+  - example
+  - scripts
+  - test
 
-## 1. Introduction
-* This repo contains a Web application with a single endpoint: http://localhost:8080/api/equityPositions?token=
-* The goal of this task is to complete the functionality required in order for the application to return an equity positions response in the format required by Stake's frontend application. This includes a transformation from a third party's data model into Stake's required response format, including some calculations. See Part 3 for everything that's required.
-* Note: the gin web framework is referenced in the repo, however feel free to subsitute it for your preferred web framework library. Keen to hear your reasoning behind picking another lib too!
+# Design
+## Components
+Here are the key components of the system
+- API, responsible for setting routers, format input request, response messages, etc.
+- Controller, responsible for starting http server, creating AdapterManager, collecting data from AdapterManager, and managing their life.
+- Internal, do something that is transparent to clients
+    - DataManager, responsible for data management (calculation, merging, etc)
+    - AdapterManager, responsible for specific adapters management
+        - MockerAdapter, an adapter for demonstration use
+       - ...
+## Float Calculation/Display
+- The built-in `float` or `double` are not suitable for currency calculation as the known precision issue in computer, so `shopstring.decimal` is used.
+- In crypto, 1e-8 is referred as a `Satoshi`, the smallest unit, so we use 8 decimal places for price, volume, and value display though it's integer in Mock for volume.
 
-## 2. Getting Started
-- Clone this repository:
-	- `git clone https://github.com/stake-test/StakeBackendGoTest_XX.git` (update 'XX' to your initials)
-- This test has been written using go version 1.18.1 in the GoLand IDE.
-- Create a new branch with your fullname in Pascal case (e.g., `AndrewVassili`) - you'll need this to raise a PR against `master` (see step 4 below)
+## Error Handling
+- If a function consumes errors it gets from its callee, it should suppress them locally with logging; if it forwards errors to its caller, it should not do logging.
 
-## 3. What you need to do
-What we would like you to do is write the remaining code in order to complete this endpoint. This includes the following:
-1. You'll notice that most of the files are in the `internal` directory - create a series of folders within the `internal` directory to improve the overall project structure. Keen to hear your reasoning behind setting up your project structure as you do.
-2. Transform the `mockdata/mockpositions.json`/`mockdata/mockprices.json` to `response/positions.go`. Note that the `mockpositions.go` and `mockprices.go` are designed to mimic a response obtained from a third party broker source, whereas the `positions.go` is the response required by Stake's Frontend applications (ie, app and web).
-3. As part of step 1's transformation process, you'll have to calculate the following values: `dayProfitOrLoss`, `dayProfitOrLossPercent`, `totalProfitOrLoss`, `totalProfitOrLossPercent`
-4. Add sufficient logging at appropriate verbosity levels
-5. Handle HTTP error responses
-6. Add unit and integration tests as you see relevant
-7. [Stretch Goal] Identify the security flaw in the API endpoint's design and fix it
+## Authentication and Security
+- The system uses Gin's middleware to authenticate users. The token is moved to the request header for security.
+- `GET` is not safe as it exposed params in URL, so it's changd to `POST`
 
-In order for the API request to work, you'll need to pass through the following user token as a query parameter: `fJCoxhq8uR9GiUIgaIGfMgw7zCqxwDhQ`.
+## Response
+- A unified response structure in `response.go` with `errCode` and `errMessage` is introduced with more info to let users know what happens when it fails
+- When no prices are available for recieved upstream positions (mock position here), the StakePosition will be delivered with some fields having "N/A" values as they depend on price information
 
-## 4. Submitting your work
-Once you have performed the above to the best of your ability:
-1. Run the application (noting the web service runs on port 8080), hit the endpoint, take a screenshot and include it in the repo at the top level directory
-2. Please raise a PR against the `master` branch
+## Logging Process
+- `zap` is introduced as it has much higher performance, and more flexible usages compared to the built-in log
+# Test
+ - Try to cover corner cases
+ - No test cases for mocker JSON parsing in `mock_adapter_test.go`, but for real adapters, data parsing has to be verified
+
+## Tracing
+- A simple tracer is added as a middleware to Gin to help us identify the performance.
+
+# Documentation
+ To make it eary to understand the system, not all documentation work are done in the root level README.md. There are some README.md files in sub-directories for details.
+
+# Arguments
+Here list items that could be done in other ways instead of ways used in the system while trying to give some explanations.
+## Position Theoretical/Market Value Calcuation
+- When calculating PNL, there are a couple of ways to calculate the value of the positions
+    - Use the mid-price of the bid and the ask
+    - Use the worse price: If you are long, the bid is used; if you are short, the ask is used
+    - Use the last traded price. In our system, this is used
+- We get the current volume in the positionWith from `PortfolioUnits` in mock Position.
+- 2 decimal place are used for percent showning, so if a value in terms of percentage is, e.g., 10.12%, the shown value is "10.12".
+## Field Mapping
+- Use field definitions in json file, so `backOfficeAvailableUnits` and `backOfficePortfolioUnits` are used, `availableUnits` and `portfolioUnits` are changed accordingly
+
+## Position Identification
+We assume there is only one account, so no account/user information for positions we have. It's easy to scale to support multiple accounts as it mentions in data_manager.go
+
+# More To Do
+- There are TODOs which mention they are not finised yet but are on the radar
+- Fill Dockerfile
+- Create a CI file (say, CircleCI) so that the repo could be managed by CI for deployment, testing, etc.
+- Fill Makefile to help users/CI build/test/deploy the system
+- The token value is hard coded. We could use other solutions, e.g., jwt-go, to generate dynamic tokens when users log in and it will be used for following opeartions.
+- Swagger are recommended to be used for documentation
+- More powerful tracer, like Ppentelemetry could be introduced in the production environment
+- More sanity checks could be added as middleware
